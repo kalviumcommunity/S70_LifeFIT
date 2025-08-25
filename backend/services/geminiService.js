@@ -40,7 +40,6 @@ async function handleZeroShotRequest(userInput) {
 }
 
 //Chain of Thought Prompt
-
 async function handleCoTRequest(userInput) {
   try {
     const prompt = `You are an AI assistant named LifeFIT. When a user describes a productivity problem, you must follow these steps:
@@ -59,5 +58,57 @@ async function handleCoTRequest(userInput) {
   }
 }
 
+//Function Calling
+
+async function handleFunctionCallRequest(userInput) {
+  const functionDeclaration = {
+    name: "create_goal_with_tasks",
+    description: "Creates a main goal and a list of sub-tasks to accomplish it.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        goal_title: {
+          type: "STRING",
+          description: "The main title of the user's goal.",
+        },
+        tasks: {
+          type: "ARRAY",
+          description: "A list of 3-5 essential sub-tasks to get started on the goal.",
+          items: {
+            type: "OBJECT",
+            properties: {
+              task_title: {
+                type: "STRING",
+                description: "The title of a single sub-task.",
+              },
+            },
+            required: ["task_title"],
+          },
+        },
+      },
+      required: ["goal_title", "tasks"],
+    },
+  };
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    tools: [{ functionDeclarations: [functionDeclaration] }],
+  });
+
+  const prompt = `Please break down the following user goal into a main goal and several actionable sub-tasks: "${userInput}"`;
+
+  const result = await model.generateContent(prompt);
+  const call = result.response.functionCalls()?.[0];
+
+  if (!call) {
+    throw new Error("The model did not return a function call. It may have responded with text instead.");
+  }
+
+  return {
+    function: call.name,
+    arguments: call.args,
+  };
+}
+
 module.exports = { 
-  handleChatRequest, handleZeroShotRequest, handleChatRequest };
+  handleChatRequest, handleZeroShotRequest, handleCoTRequest, handleFunctionCallRequest };
