@@ -110,5 +110,41 @@ async function handleFunctionCallRequest(userInput) {
   };
 }
 
+//Multi-Shot Prompt
+
+async function handleMultiShotRequest(userInput) {
+  try {
+    const prompt = `You are LifeFIT, an encouraging AI assistant. Your goal is to provide a positive affirmation and three simple first steps when a user states a goal. Follow the exact format of the examples provided.
+
+Example 1:
+User: I want to eat healthier.
+AI:
+Nourishing your body is a wonderful act of self-care. Here are a few first steps:
+- Swap one sugary drink for water each day.
+- Add one serving of vegetables to your dinner.
+- Plan your meals for the next two days.
+
+Example 2:
+User: I want to be more organized.
+AI:
+Creating order in your environment brings clarity to your mind. Here's how you can start:
+- Tidy your main workspace for 15 minutes.
+- Write down the top 3 most important tasks for tomorrow.
+- Choose a specific place for your keys and wallet.
+
+Now, respond to the user's goal in the same way.
+
+User: ${userInput}
+AI:`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Error in handleMultiShotRequest:", error);
+    throw new Error("Failed to generate multi-shot content from AI service.");
+  }
+}
+
 module.exports = { 
-  handleChatRequest, handleZeroShotRequest, handleCoTRequest, handleFunctionCallRequest };
+  handleChatRequest, handleZeroShotRequest, handleCoTRequest, handleFunctionCallRequest, handleMultiShotRequest };

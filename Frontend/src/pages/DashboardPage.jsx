@@ -16,6 +16,9 @@ const [strategyInput, setStrategyInput] = useState('');
   const [functionInput, setFunctionInput] = useState('');
   const [functionResponse, setFunctionResponse] = useState(null); 
   const [isFunctionLoading, setIsFunctionLoading] = useState(false);
+  const [multiShotInput, setMultiShotInput] = useState('');
+  const [multiShotResponse, setMultiShotResponse] = useState('');
+  const [isMultiShotLoading, setIsMultiShotLoading] = useState(false);
 
 
   const handleFunctionCallSubmit = async (e) => {
@@ -65,13 +68,28 @@ const [strategyInput, setStrategyInput] = useState('');
     }
     setIsStrategyLoading(false);
   };
+
+  const handleMultiShotSubmit = async (e) => {
+    e.preventDefault();
+    if (!multiShotInput || isMultiShotLoading) return;
+
+    setIsMultiShotLoading(true);
+    setMultiShotResponse('');
+    try {
+      const response = await axios.post('http://localhost:8000/api/affirmation', { userInput: multiShotInput });
+      setMultiShotResponse(response.data.response);
+    } catch (error) {
+      console.error("Error fetching multi-shot response:", error);
+      setMultiShotResponse("Sorry, couldn't get a response right now.");
+    }
+    setIsMultiShotLoading(false);
+  };
   
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
       <main>
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          {/* AI Productivity Assistant Section */}
           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4">AI Productivity Assistant</h3>
             <p className="text-gray-600 mb-4">Feeling stuck? Describe your problem below to get some helpful tips.</p>
@@ -93,6 +111,7 @@ const [strategyInput, setStrategyInput] = useState('');
               </button>
             </form>
 
+    </div>
              <div className="bg-white p-6 rounded-lg shadow-md mt-10 mb-6">
             <h3 className="text-xl font-bold text-gray-800 mb-2">Get a Goal Strategy</h3>
             <p className="text-gray-600 mb-4">Describe a productivity challenge to get a step-by-step plan.</p>
@@ -121,7 +140,7 @@ const [strategyInput, setStrategyInput] = useState('');
               </div>
             )}
           </div>
-          </div>
+      
 
           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
             <h3 className="text-xl font-bold text-gray-800 mb-2">AI Task Creator</h3>
@@ -151,6 +170,36 @@ const [strategyInput, setStrategyInput] = useState('');
               </div>
             )}
           </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Get an Affirmation & First Steps</h3>
+            <p className="text-gray-600 mb-4">State a goal to get a dose of encouragement and a simple plan.</p>
+            <form onSubmit={handleMultiShotSubmit}>
+              <textarea
+                value={multiShotInput}
+                onChange={(e) => setMultiShotInput(e.target.value)}
+                placeholder="e.g., I want to read more books"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows="3"
+              />
+              <button
+                type="submit"
+                disabled={isMultiShotLoading}
+                className="mt-4 bg-teal-600 text-white py-2 px-4 rounded-md hover:bg-teal-700 transition-colors disabled:bg-gray-400"
+              >
+                {isMultiShotLoading ? 'Inspiring...' : 'Inspire Me'}
+              </button>
+            </form>
+            {multiShotResponse && (
+              <div className="mt-6">
+                <h4 className="font-semibold text-gray-800 mb-2">Here's a thought:</h4>
+                <div className="bg-gray-50 p-4 rounded-md whitespace-pre-wrap font-sans">
+                  {multiShotResponse}
+                </div>
+              </div>
+            )}
+          </div>
+          
 
           
           <TaskList />
