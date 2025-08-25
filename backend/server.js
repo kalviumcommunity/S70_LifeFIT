@@ -4,7 +4,8 @@ const cors = require('cors');
 const { 
   handleChatRequest, 
   handleZeroShotRequest,
-  handleChatRequest 
+   handleCoTRequest,
+  handleFunctionCallRequest
 } = require('./services/geminiService');
 
 const app = express();
@@ -49,6 +50,22 @@ app.post('/api/strategy', async (req, res) => {
         res.json({ strategy: aiResponse });
     } catch (error) {
         res.status(500).json({ error: "Failed to process strategy request." });
+    }
+});
+
+// Route for function calling
+
+app.post('/api/createtasks', async (req, res) => {
+    try {
+        const { userInput } = req.body;
+        if (!userInput) {
+            return res.status(400).json({ error: "User input is required." });
+        }
+        const functionCallData = await handleFunctionCallRequest(userInput);
+        res.json(functionCallData);
+    } catch (error) {
+        console.error("Error in /api/createtasks route:", error);
+        res.status(500).json({ error: "Failed to process function call request." });
     }
 });
 

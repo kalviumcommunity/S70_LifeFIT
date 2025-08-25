@@ -13,6 +13,26 @@ function DashboardPage() {
 const [strategyInput, setStrategyInput] = useState('');
   const [strategyResponse, setStrategyResponse] = useState('');
   const [isStrategyLoading, setIsStrategyLoading] = useState(false);
+  const [functionInput, setFunctionInput] = useState('');
+  const [functionResponse, setFunctionResponse] = useState(null); 
+  const [isFunctionLoading, setIsFunctionLoading] = useState(false);
+
+
+  const handleFunctionCallSubmit = async (e) => {
+    e.preventDefault();
+    if (!functionInput || isFunctionLoading) return;
+
+    setIsFunctionLoading(true);
+    setFunctionResponse(null);
+    try {
+      const response = await axios.post('http://localhost:8000/api/createtasks', { userInput: functionInput });
+      setFunctionResponse(response.data);
+    } catch (error) {
+      console.error("Error fetching function call:", error);
+      setFunctionResponse({ error: "Sorry, couldn't generate a task plan right now." });
+    }
+    setIsFunctionLoading(false);
+  };
 
   const getSuggestions = async (e) => {
     e.preventDefault();
@@ -102,6 +122,36 @@ const [strategyInput, setStrategyInput] = useState('');
             )}
           </div>
           </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">AI Task Creator</h3>
+            <p className="text-gray-600 mb-4">Describe a goal, and the AI will generate a structured task plan.</p>
+            <form onSubmit={handleFunctionCallSubmit}>
+              <textarea
+                value={functionInput}
+                onChange={(e) => setFunctionInput(e.target.value)}
+                placeholder="e.g., Organize my garage this weekend"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows="3"
+              />
+              <button
+                type="submit"
+                disabled={isFunctionLoading}
+                className="mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors disabled:bg-gray-400"
+              >
+                {isFunctionLoading ? 'Generating Plan...' : 'Generate Task Plan'}
+              </button>
+            </form>
+            {functionResponse && (
+              <div className="mt-6">
+                <h4 className="font-semibold text-gray-800 mb-2">Generated Function Call:</h4>
+                <pre className="bg-gray-900 text-white p-4 rounded-md whitespace-pre-wrap text-sm">
+                  <code>{JSON.stringify(functionResponse, null, 2)}</code>
+                </pre>
+              </div>
+            )}
+          </div>
+
           
           <TaskList />
         </div>
