@@ -1,11 +1,10 @@
-// backend/index.js - CORRECTED
 
 const express = require('express');
 const cors = require('cors');
-// We are IMPORTING our functions from the other file
 const { 
   handleChatRequest, 
-  handleZeroShotRequest 
+  handleZeroShotRequest,
+  handleChatRequest 
 } = require('./services/geminiService');
 
 const app = express();
@@ -37,6 +36,19 @@ app.post('/api/generate', async (req, res) => {
         res.json({ suggestions: aiResponse });
     } catch (error) {
         res.status(500).json({ error: "Failed to process generate request." });
+    }
+});
+// Route for Chain of Thought Prompt
+app.post('/api/strategy', async (req, res) => {
+    try {
+        const { userInput } = req.body;
+        if (!userInput) {
+            return res.status(400).json({ error: "User input is required." });
+        }
+        const aiResponse = await handleCoTRequest(userInput);
+        res.json({ strategy: aiResponse });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to process strategy request." });
     }
 });
 
