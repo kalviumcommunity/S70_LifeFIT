@@ -5,7 +5,8 @@ const {
   handleChatRequest, 
   handleZeroShotRequest,
    handleCoTRequest,
-  handleFunctionCallRequest
+  handleFunctionCallRequest,
+  handleMultiShotRequest
 } = require('./services/geminiService');
 
 const app = express();
@@ -68,6 +69,22 @@ app.post('/api/createtasks', async (req, res) => {
         res.status(500).json({ error: "Failed to process function call request." });
     }
 });
+
+// Route for multishot
+
+app.post('/api/affirmation', async (req, res) => {
+    try {
+        const { userInput } = req.body;
+        if (!userInput) {
+            return res.status(400).json({ error: "User input is required." });
+        }
+        const aiResponse = await handleMultiShotRequest(userInput);
+        res.json({ response: aiResponse });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to process affirmation request." });
+    }
+});
+
 
 const PORT = 8000;
 app.listen(PORT, () => {
