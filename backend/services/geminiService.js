@@ -146,5 +146,30 @@ AI:`;
   }
 }
 
+// Oneshot prompt
+
+async function handleOneShotRequest(userInput) {
+  try {
+    const prompt = `You are LifeFIT, an AI assistant that provides quick, actionable advice. When a user names an area of their life, provide a single, encouraging, and easy-to-implement tip. Follow the format of the example provided.
+
+Example:
+User: My workspace
+AI:
+Clear one thing off your desk that you don't need for your next task. A clear space leads to a clear mind.
+
+Now, respond to the user's input in the same way.
+
+User: ${userInput}
+AI:`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Error in handleOneShotRequest:", error);
+    throw new Error("Failed to generate one-shot content from AI service.");
+  }
+}
+
 module.exports = { 
-  handleChatRequest, handleZeroShotRequest, handleCoTRequest, handleFunctionCallRequest, handleMultiShotRequest };
+  handleChatRequest, handleZeroShotRequest, handleCoTRequest, handleFunctionCallRequest, handleMultiShotRequest, handleOneShotRequest  };

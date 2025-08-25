@@ -6,7 +6,7 @@ const {
   handleZeroShotRequest,
    handleCoTRequest,
   handleFunctionCallRequest,
-  handleMultiShotRequest
+  handleMultiShotRequest, handleOneShotRequest,
 } = require('./services/geminiService');
 
 const app = express();
@@ -82,6 +82,21 @@ app.post('/api/affirmation', async (req, res) => {
         res.json({ response: aiResponse });
     } catch (error) {
         res.status(500).json({ error: "Failed to process affirmation request." });
+    }
+});
+
+//Route for Oneshot 
+
+app.post('/api/quickwin', async (req, res) => {
+    try {
+        const { userInput } = req.body;
+        if (!userInput) {
+            return res.status(400).json({ error: "User input is required." });
+        }
+        const aiResponse = await handleOneShotRequest(userInput);
+        res.json({ response: aiResponse });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to process quick win request." });
     }
 });
 
