@@ -9,9 +9,9 @@ const mockTasks = [
 ];
 
 function TaskList() {
-    const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState(mockTasks);
 
-    const handleDeleteTask = (taskId) => {
+  const handleDeleteTask = (taskId) => {
     const updatedTasks = tasks.filter(task => task.id !== taskId);
     setTasks(updatedTasks);
   };
@@ -27,7 +27,7 @@ function TaskList() {
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h3 className="text-xl font-bold text-gray-800 mb-4">Today's Tasks</h3>
       <div>
-        {mockTasks.map(task => (
+        {tasks.map(task => (
           <TaskItem
             key={task.id}
             task={task}
