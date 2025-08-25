@@ -13,15 +13,15 @@ const DeleteIcon = () => (
 );
 
 
-function TaskItem({ task }) {
+function TaskItem({ task, onDelete, onToggleComplete }) {
   return (
-    <div className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm mb-2">
+    <div className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm mb-2 hover:bg-gray-50 transition-colors">
       <div className="flex items-center">
         <input
           type="checkbox"
           checked={task.completed}
-          readOnly
-          className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          onChange={() => onToggleComplete(task.id)}
+          className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
         />
         <span className={`ml-3 text-gray-800 ${task.completed ? 'line-through text-gray-400' : ''}`}>
           {task.text}
@@ -31,7 +31,10 @@ function TaskItem({ task }) {
         <button className="text-gray-400 hover:text-blue-500 transition-colors">
           <EditIcon />
         </button>
-        <button className="text-gray-400 hover:text-red-500 transition-colors">
+        <button
+          onClick={() => onDelete(task.id)}
+          className="text-gray-400 hover:text-red-500 transition-colors"
+        >
           <DeleteIcon />
         </button>
       </div>
