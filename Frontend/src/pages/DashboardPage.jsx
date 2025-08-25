@@ -9,16 +9,24 @@ function DashboardPage() {
   const [userInput, setUserInput] = useState('');
   const [suggestions, setSuggestions] = useState(''); 
   const [isLoading, setIsLoading] = useState(false);
+
   const systemPrompt = "You are an AI assistant named LifeFIT";
-const [strategyInput, setStrategyInput] = useState('');
+
+  const [strategyInput, setStrategyInput] = useState('');
   const [strategyResponse, setStrategyResponse] = useState('');
   const [isStrategyLoading, setIsStrategyLoading] = useState(false);
+
   const [functionInput, setFunctionInput] = useState('');
   const [functionResponse, setFunctionResponse] = useState(null); 
   const [isFunctionLoading, setIsFunctionLoading] = useState(false);
+
   const [multiShotInput, setMultiShotInput] = useState('');
   const [multiShotResponse, setMultiShotResponse] = useState('');
   const [isMultiShotLoading, setIsMultiShotLoading] = useState(false);
+
+  const [oneShotInput, setOneShotInput] = useState('');
+  const [oneShotResponse, setOneShotResponse] = useState('');
+  const [isOneShotLoading, setIsOneShotLoading] = useState(false);
 
 
   const handleFunctionCallSubmit = async (e) => {
@@ -84,6 +92,24 @@ const [strategyInput, setStrategyInput] = useState('');
     }
     setIsMultiShotLoading(false);
   };
+
+  const handleOneShotSubmit = async (e) => {
+    e.preventDefault();
+    if (!oneShotInput || isOneShotLoading) return;
+
+    setIsOneShotLoading(true);
+    setOneShotResponse('');
+    try {
+      const response = await axios.post('http://localhost:8000/api/quickwin', { userInput: oneShotInput });
+      setOneShotResponse(response.data.response);
+    } catch (error) {
+      console.error("Error fetching one-shot response:", error);
+      setOneShotResponse("Sorry, couldn't get a response right now.");
+    }
+    setIsOneShotLoading(false);
+  };
+
+
   
   return (
     <div className="min-h-screen bg-gray-100">
@@ -195,6 +221,35 @@ const [strategyInput, setStrategyInput] = useState('');
                 <h4 className="font-semibold text-gray-800 mb-2">Here's a thought:</h4>
                 <div className="bg-gray-50 p-4 rounded-md whitespace-pre-wrap font-sans">
                   {multiShotResponse}
+                </div>
+              </div>
+            )}
+          </div>
+
+           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Quick Win Generator</h3>
+            <p className="text-gray-600 mb-4">Name an area of your life to get one simple, actionable tip.</p>
+            <form onSubmit={handleOneShotSubmit}>
+              <input
+                type="text"
+                value={oneShotInput}
+                onChange={(e) => setOneShotInput(e.target.value)}
+                placeholder="e.g., My diet"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="submit"
+                disabled={isOneShotLoading}
+                className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-md hover:bg-orange-600 transition-colors disabled:bg-gray-400"
+              >
+                {isOneShotLoading ? 'Finding a tip...' : 'Get Quick Win'}
+              </button>
+            </form>
+            {oneShotResponse && (
+              <div className="mt-6">
+                <h4 className="font-semibold text-gray-800 mb-2">Here's a quick win:</h4>
+                <div className="bg-gray-50 p-4 rounded-md whitespace-pre-wrap font-sans">
+                  {oneShotResponse}
                 </div>
               </div>
             )}
